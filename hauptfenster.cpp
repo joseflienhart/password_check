@@ -1,52 +1,81 @@
-//
-// Created by joseflienhart on 27.03.26.
-//
-
 #include "hauptfenster.h"
-#include "hauptfenster.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout> // Neu: Ein Layout, das Dinge Horizontal (nebeneinander) anordnet
+#include <QRandomGenerator> // Neu: Um Fake-Sensordaten zu generieren
+
+Hauptfenster::Hauptfenster(QWidget *parent) : QWidget(parent) {
+    setWindowTitle("Sensor-Simulator");
+    resize(400, 200);
+
+    // Das vertikale Haupt-Layout (von oben nach unten)
+    QVBoxLayout *hauptLayout = new QVBoxLayout(this);
+
+    wertLabel = new QLabel("Aktueller Wert: 0");
+    wertLabel->setAlignment(Qt::AlignCenter);
+    hauptLayout->addWidget(wertLabel);
+
+    // Eine Fortschrittsanzeige erstellen
+    balken = new QProgressBar();
+    balken->setRange(0, 100); // Der Sensor misst Werte von 0 bis 100
+    balken->setValue(0);
+    hauptLayout->addWidget(balken);
+
+    // --- Layout-Trick: Buttons nebeneinander ---
+    // Wir erstellen ein kleines horizontales Layout (links nach rechts)
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+
+    startButton = new QPushButton("Start");
+    stopButton = new QPushButton("Stopp");
+    stopButton->setEnabled(false); // Stopp ist am Anfang ausgegraut
+
+    // Buttons in das kleine Layout packen
+    buttonLayout->addWidget(startButton);
+    buttonLayout->addWidget(stopButton);
+
+    // Das kleine horizontale Layout in das große vertikale Layout packen
+    hauptLayout->addLayout(buttonLayout);
 
 
-//Konstruktor mit member-Initialisierungsliste: "QWidget *parent" ist Eingabeparameter, in "QWidget(parent) wird dieser verwendet
-hauptfenster::hauptfenster(QWidget *parent) : QWidget(parent) {
-    setWindowTitle("persönlicher Passwortmanager");
-    resize(500,200);
+    // --- Der Timer ---
+    // Wir erschaffen den Timer und geben ihm das Fenster als Elternteil (this)
+    sensorTimer = new QTimer(this);
 
-    //this-Zeiger zeigt auf DIESES Fenster
-    QVBoxLayout *layout = new QVBoxLayout(this);
 
-    //Widgets erstellen und den Membern zuweisen:
-    aufforderung_m= new QLabel("Geben Sie ihr Passwort ein:");
-    layout->addWidget(aufforderung_m);
+    // --- Die Verbindungen (Kabel verlegen) ---
+    connect(startButton, &QPushButton::clicked, this, &Hauptfenster::startSensor);
+    connect(stopButton, &QPushButton::clicked, this, &Hauptfenster::stopSensor);
 
-    eingabe_m = new QLineEdit();
-    eingabe_m->setPlaceholderText("Ihr Passwort");
-    layout->addWidget(eingabe_m);
-
-    druckknopf_m = new QPushButton("bestaetigen");
-    layout->addWidget(druckknopf_m);
-
-    ausgabe_m = new QLabel("");
-    layout->addWidget(ausgabe_m);
-
-    //Der clou: Die Verbindung
-    connect(druckknopf_m, &QPushButton::clicked, this, &hauptfenster::rueckgabe);
+    // MAGIE: Wenn der Timer "abläuft", rufen wir "leseDaten" auf
+    connect(sensorTimer, &QTimer::timeout, this, &Hauptfenster::leseDaten);
 }
 
-//Der Destruktor:
-hauptfenster::~hauptfenster() {
-
+Hauptfenster::~Hauptfenster() {
 }
 
-//Die Slot-Funktion
-void hauptfenster::rueckgabe() {
-    //Variable definieren und Textfeld auslesen
-    QString eingegebenes_passwort = eingabe_m->text();
+void Hauptfenster::startSensor() {
+    // Timer starten! Er tickt jetzt alle 500 Millisekunden (0,5 Sekunden)
+    sensorTimer->start(500);
 
-    if (eingegebenes_passwort == "VdH2503/+()") {
-        ausgabe_m->setText("Passwort ist korrekt!");
-    }else if (eingegebenes_passwort == "") {
-        ausgabe_m->setText("Bitte geben Sie ein gültiges Passwort ein!");
-    }else {
-        ausgabe_m->setText("Das Passwort ist nicht korrekt!");
-    }
+    // Buttons umschalten
+    startButton->setEnabled(false);
+    stopButton->setEnabled(true);
+}
+
+void Hauptfenster::stopSensor() {
+    // Timer anhalten
+    sensorTimer->stop();
+
+    // Buttons zurücksetzen
+    startButton->setEnabled(true);
+    stopButton->setEnabled(false);
+}
+
+void Hauptfenster::leseDaten() {
+    // Hier würden wir später echte Linux-Systemdateien auslesen.
+    // Für heute simulieren wir die Hardware mit einer Zufallszahl zwischen 0 und 100.
+    int sensorWert = QRandomGenerator::global()->bounded(0, 101);
+
+    // Die GUI mit den neuen Daten aktualisieren
+    wertLabel->setText("Aktueller Wert: " + QString::number(sensorWert));
+    balken->setValue(sensorWert);
 }

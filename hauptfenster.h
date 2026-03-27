@@ -1,35 +1,33 @@
-//
-// Created by joseflienhart on 27.03.26.
-//
+#ifndef HAUPTFENSTER_H
+#define HAUPTFENSTER_H
 
-#ifndef UNTITLED_HAUPTFENSTER_H
-#define UNTITLED_HAUPTFENSTER_H
 #include <QWidget>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
-#include <QVBoxLayout>
+#include <QProgressBar> // Neu: Für einen schicken Ladebalken/Ausschlag
+#include <QTimer>       // Neu: Unsere unsichtbare Stoppuhr
 
-
-class hauptfenster : public QWidget {
-    /////////////////////////////////////Wichtiges Makro!!!!!
+class Hauptfenster : public QWidget {
     Q_OBJECT
 
 public:
-    //Konstruktor und Destruktor
-    hauptfenster(QWidget* parent = nullptr);
-    ~hauptfenster();
+    Hauptfenster(QWidget *parent = nullptr);
+    ~Hauptfenster();
 
-    //Definition von Slots als eigene Funktionen auf Reaktionen von Eingaben
 private slots:
-    void rueckgabe();
+    // Wir brauchen jetzt drei eigene Funktionen
+    void startSensor();
+    void stopSensor();
+    void leseDaten(); // Diese Funktion wird vom Timer aufgerufen
 
 private:
-    //Member_Variablen speichern:
-    QLabel *aufforderung_m;
-    QLineEdit *eingabe_m;
-    QPushButton *druckknopf_m;
-    QLabel *ausgabe_m;
+    QLabel *wertLabel;
+    QProgressBar *balken;
+    QPushButton *startButton;
+    QPushButton *stopButton;
+
+    // Unser Timer als Member-Variable, damit wir ihn überall starten/stoppen können
+    QTimer *sensorTimer;
 };
 
-#endif //UNTITLED_HAUPTFENSTER_H
+#endif // HAUPTFENSTER_H

@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
     //Objekt aus Klasse erstellen
-    hauptfenster fenster;
+    Hauptfenster fenster;
     fenster.show();
 
     return app.exec();
