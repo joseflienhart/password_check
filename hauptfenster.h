@@ -14,20 +14,13 @@ public:
     Hauptfenster(QWidget *parent = nullptr);
     ~Hauptfenster();
 
-private slots:
-    // Wir brauchen jetzt drei eigene Funktionen
-    void startSensor();
-    void stopSensor();
-    void leseDaten(); // Diese Funktion wird vom Timer aufgerufen
-
 private:
-    QLabel *wertLabel;
-    QProgressBar *balken;
-    QPushButton *startButton;
-    QPushButton *stopButton;
+    QPushButton *first;
+    QPushButton *second;
+    QPushButton *third;
+    QPushButton *fourth;
+    QPushButton *fifth;
 
-    // Unser Timer als Member-Variable, damit wir ihn überall starten/stoppen können
-    QTimer *sensorTimer;
 };
 
 #endif // HAUPTFENSTER_H
